@@ -76,9 +76,15 @@ if (fs.existsSync(envPath)) {
 }
 
 /**
- * Cria um controller para timeout de requisições
+ * Cria um controller para timeout de requisições com AbortController
+ * @param {number} timeoutMs - Tempo limite em milissegundos
+ * @returns {{controller: AbortController, timeout: NodeJS.Timeout}} Controller e timeout ID
+ * @throws {Error} Se timeoutMs não for um número válido
  */
 function createTimeoutController(timeoutMs) {
+  if (!Number.isInteger(timeoutMs) || timeoutMs <= 0) {
+    throw new Error('Timeout deve ser um número inteiro positivo');
+  }
   const controller = new AbortController();
   const timeout = setTimeout(() => {
     controller.abort();
@@ -88,9 +94,15 @@ function createTimeoutController(timeoutMs) {
 }
 
 /**
- * Valida a resposta da API
+ * Valida a resposta da API do LLM e extrai o conteúdo
+ * @param {Object} data - Dados de resposta da API
+ * @returns {string} Conteúdo da mensagem extraída
+ * @throws {Error} Se a estrutura da resposta for inválida
  */
 function validateResponse(data) {
+  if (!data || typeof data !== 'object') {
+    throw new Error('Resposta da API inválida: dados ausentes ou formato incorreto');
+  }
   if (!data) {
     throw new Error('Resposta vazia da API');
   }
@@ -112,9 +124,19 @@ function validateResponse(data) {
 }
 
 /**
- * Prepara as mensagens para envio
+ * Prepara e valida as mensagens para envio ao LLM
+ * @param {Array<Object>} messages - Array de mensagens com role e content
+ * @returns {Array<Object>} Mensagens processadas e validadas
+ * @throws {Error} Se o formato das mensagens for inválido
  */
 function prepareMessages(messages) {
+  if (!Array.isArray(messages)) {
+    throw new Error('Mensagens devem ser um array');
+  }
+  
+  if (messages.length === 0) {
+    throw new Error('Array de mensagens não pode estar vazio');
+  }
   if (!Array.isArray(messages)) {
     throw new Error('Messages deve ser um array');
   }
@@ -126,9 +148,16 @@ function prepareMessages(messages) {
 }
 
 /**
- * Calcula delay exponencial para retry
+ * Calcula delay exponencial para retry com jitter para evitar thundering herd
+ * @param {number} attempt - Número da tentativa atual (1-based)
+ * @returns {number} Delay em milissegundos
  */
 function getRetryDelay(attempt) {
+  const baseDelay = 1000; // 1 segundo base
+  const exponentialDelay = baseDelay * Math.pow(2, attempt - 1);
+  // Adiciona jitter de ±25% para evitar que todos os clientes tentem simultaneamente
+  const jitter = exponentialDelay * 0.25 * (Math.random() - 0.5);
+  return Math.min(exponentialDelay + jitter, 30000); // Máximo de 30 segundos
   return Math.min(1000 * Math.pow(2, attempt - 1), 10000); // Max 10s
 }
 
@@ -201,10 +230,10 @@ export const askLLM = measureTime(async function(messages) {
       if (isLastAttempt) {
         await errorLogger.logError(error, {
           context: 'llm_request_failed',
-          endpoint: ENDPOINT,
-          model: MODEL,
+          endpoint: llmConfig.ENDPOINT,
+          model: llmConfig.MODEL,
           attempt: attempt,
-          maxRetries: MAX_RETRIES,
+          maxRetries: llmConfig.MAX_RETRIES,
           messageCount: preparedMessages.length,
           isTimeoutError,
           isNetworkError
@@ -214,7 +243,7 @@ export const askLLM = measureTime(async function(messages) {
         
         // Erro mais específico para timeout
         if (isTimeoutError) {
-          throw new Error(`Timeout após ${REQUEST_TIMEOUT}ms - modelo pode estar sobrecarregado`);
+          throw new Error(`Timeout após ${llmConfig.REQUEST_TIMEOUT}ms - modelo pode estar sobrecarregado`);
         }
         
         throw new Error(`Falha na comunicação com LLM: ${error.message}`);
