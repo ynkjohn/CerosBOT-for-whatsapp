@@ -1,0 +1,53 @@
+{
+  "name": "ceros-control-panel",
+  "version": "1.0.0",
+  "description": "Painel de controle desktop para Ceros AI Bot",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron . --no-sandbox --disable-gpu --disable-software-rasterizer --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --disable-features=TranslateUI --disable-ipc-flooding-protection 2>nul",
+    "dev": "electron . --dev --no-sandbox --disable-gpu",
+    "start-clean": "electron . --no-sandbox --disable-gpu --disable-software-rasterizer --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --disable-features=TranslateUI --disable-ipc-flooding-protection --silent 2>nul",
+    "start-silent": "electron . --no-sandbox --disable-gpu --disable-dev-shm-usage --disable-software-rasterizer --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --disable-features=TranslateUI --disable-ipc-flooding-protection --log-level=3 2>nul",
+    "build": "electron-builder",
+    "build-win": "electron-builder --win",
+    "build-mac": "electron-builder --mac",
+    "build-linux": "electron-builder --linux"
+  },
+  "keywords": [
+    "electron",
+    "ceros-ai",
+    "whatsapp-bot",
+    "control-panel"
+  ],
+  "author": "Ceros AI Team",
+  "license": "MIT",
+  "dependencies": {
+    "electron": "^27.0.0"
+  },
+  "devDependencies": {
+    "electron-builder": "^24.6.4"
+  },
+  "build": {
+    "appId": "com.cerosai.controlpanel",
+    "productName": "Ceros AI Control Panel",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*"
+    ],
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": "nsis"
+    },
+    "mac": {
+      "icon": "assets/icon.icns",
+      "target": "dmg"
+    },
+    "linux": {
+      "icon": "assets/icon.png",
+      "target": "AppImage"
+    }
+  }
+}

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ceros AI Control Panel</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-robot"></i>
+                    <h1>Ceros AI Control Panel</h1>
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot" id="statusDot"></div>
+                    <span id="statusText">Conectando...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="sidebar">
+            <ul class="nav-menu">
+                <li class="nav-item active" data-page="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </li>
+                <li class="nav-item" data-page="config">
+                    <i class="fas fa-cog"></i>
+                    <span>Configurações</span>
+                </li>
+                <li class="nav-item" data-page="stats">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Estatísticas</span>
+                </li>
+                <li class="nav-item" data-page="logs">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Logs</span>
+                </li>
+                <li class="nav-item" data-page="backups">
+                    <i class="fas fa-database"></i>
+                    <span>Backups</span>
+                </li>
+                <li class="nav-item" data-page="users">
+                    <i class="fas fa-users"></i>
+                    <span>Usuários</span>
+                </li>
+                <li class="nav-item" data-page="actions">
+                    <i class="fas fa-tools"></i>
+                    <span>Ações</span>
+                </li>
+                    <li class="nav-item" data-page="activity">
+                        <i class="fas fa-bolt"></i>
+                        <span>Atividade</span>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page active">
+                <div class="page-header">
+                    <h2><i class="fas fa-home"></i> Dashboard</h2>
+                    <button class="btn btn-primary" onclick="refreshDashboard()">
+                        <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- Status Cards -->
+                    <div class="card status-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-robot"></i> Status do Bot</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="status-item">
+                                <span class="label">Status:</span>
+                                <span class="value" id="botConnectionStatus">Offline</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Uptime:</span>
+                                <span class="value" id="botUptime">0h 0m</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Modelo:</span>
+                                <span class="value" id="aiModel">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Memory Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-memory"></i> Memória</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="status-item">
+                                <span class="label">Chats Ativos:</span>
+                                <span class="value" id="chatCount">0</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Mensagens:</span>
+                                <span class="value" id="messageCount">0</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Tamanho:</span>
+                                <span class="value" id="memorySize">0 KB</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rate Limit Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-tachometer-alt"></i> Rate Limiting</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="status-item">
+                                <span class="label">Usuários Únicos:</span>
+                                <span class="value" id="totalUsers">0</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Ativos (1h):</span>
+                                <span class="value" id="activeUsers">0</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Requests (1h):</span>
+                                <span class="value" id="totalRequests">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-server"></i> Sistema</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="status-item">
+                                <span class="label">Memória Node:</span>
+                                <span class="value" id="nodeMemory">0 MB</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Plataforma:</span>
+                                <span class="value" id="platform">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-bolt"></i> Ações Rápidas</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="action-buttons">
+                            <button class="btn btn-success" onclick="testLLM()">
+                                <i class="fas fa-brain"></i> Testar IA
+                            </button>
+                            <button class="btn btn-warning" onclick="createBackup()">
+                                <i class="fas fa-save"></i> Backup
+                            </button>
+                            <button class="btn btn-danger" onclick="clearMemory()">
+                                <i class="fas fa-trash"></i> Limpar Memória
+                            </button>
+                            <button class="btn btn-info" onclick="restartBot()">
+                                <i class="fas fa-redo"></i> Reiniciar Bot
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuration Page -->
+            <div id="config" class="page">
+                <div class="page-header">
+                    <h2><i class="fas fa-cog"></i> Configurações</h2>
+                    <button class="btn btn-success" onclick="saveConfig()">
+                        <i class="fas fa-save"></i> Salvar
+                    </button>
+                </div>
+
+                <div class="config-grid">
+                    <!-- LLM Settings -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-brain"></i> Configurações da IA</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-group">
+                                <label for="apiEndpoint">Servidor LLM (IP:Porta):</label>
+                                <input type="text" id="apiEndpoint" class="form-control" placeholder="http://localhost:1234">
+                                <small class="form-text">Exemplo: http://192.168.1.100:1234 ou http://localhost:1234</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="modelName">Nome do Modelo:</label>
+                                <input type="text" id="modelName" class="form-control" placeholder="llama-3.1-8b-lexi-uncensored-v2">
+                            </div>
+                            <div class="form-group">
+                                <label for="maxTokens">Max Tokens: <span id="maxTokensValue">800</span></label>
+                                <input type="range" id="maxTokens" class="form-range" min="100" max="4000" value="800" oninput="updateSliderValue('maxTokens', 'maxTokensValue')">
+                            </div>
+                            <div class="form-group">
+                                <label for="temperature">Temperature: <span id="temperatureValue">0.75</span></label>
+                                <input type="range" id="temperature" class="form-range" min="0" max="2" step="0.01" value="0.75" oninput="updateSliderValue('temperature', 'temperatureValue')">
+                            </div>
+                            <div class="form-group">
+                                <label for="topP">Top P: <span id="topPValue">0.9</span></label>
+                                <input type="range" id="topP" class="form-range" min="0" max="1" step="0.01" value="0.9" oninput="updateSliderValue('topP', 'topPValue')">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bot Settings -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-robot"></i> Configurações do Bot</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-group">
+                                <label for="adminNumbers">Números Admin (separados por vírgula):</label>
+                                <input type="text" id="adminNumbers" class="form-control" placeholder="5511999999999,5511888888888">
+                            </div>
+                            <div class="form-group">
+                                <label for="duplicateTimeout">Timeout Duplicados (ms):</label>
+                                <input type="number" id="duplicateTimeout" class="form-control" value="5000" min="1000" max="30000">
+                            </div>
+                            <div class="form-group">
+                                <label for="groupRandomChance">Chance Resposta Grupos: <span id="groupRandomChanceValue">0.25</span></label>
+                                <input type="range" id="groupRandomChance" class="form-range" min="0" max="1" step="0.01" value="0.25" oninput="updateSliderValue('groupRandomChance', 'groupRandomChanceValue')">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rate Limiting -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-tachometer-alt"></i> Rate Limiting</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-group">
+                                <label for="maxRequestsPerMinute">Max Requests por Minuto:</label>
+                                <input type="number" id="maxRequestsPerMinute" class="form-control" value="10" min="1" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label for="maxRequestsPerHour">Max Requests por Hora:</label>
+                                <input type="number" id="maxRequestsPerHour" class="form-control" value="50" min="10" max="1000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Memory Settings -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-memory"></i> Configurações de Memória</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-group">
+                                <label for="maxHistoryMessages">Max Mensagens por Chat:</label>
+                                <input type="number" id="maxHistoryMessages" class="form-control" value="50" min="10" max="200">
+                            </div>
+                            <div class="form-group">
+                                <label for="maxBackups">Max Backups:</label>
+                                <input type="number" id="maxBackups" class="form-control" value="10" min="3" max="50">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Page -->
+            <div id="stats" class="page">
+                <div class="page-header">
+                    <h2><i class="fas fa-chart-bar"></i> Estatísticas</h2>
+                    <button class="btn btn-primary" onclick="refreshStats()">
+                        <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
+                </div>
+
+                <div id="statsContent">
+                    <div class="loading">Carregando estatísticas...</div>
+                </div>
+            </div>
+
+            <!-- Logs Page -->
+            <div id="logs" class="page">
+                <div class="page-header">
+                    <h2><i class="fas fa-file-alt"></i> Logs</h2>
+                    <div>
+                        <button class="btn btn-primary" onclick="refreshLogs()">
+                            <i class="fas fa-sync-alt"></i> Atualizar
+                        </button>
+                        <button class="btn btn-warning" onclick="clearLogs()">
+                            <i class="fas fa-trash"></i> Limpar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Logs de Erro</h3>
+                    </div>
+                    <div class="card-content">
+                        <div id="logsContainer" class="logs-container">
+                            <div class="loading">Carregando logs...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backups Page -->
+            <div id="backups" class="page">
+                <div class="page-header">
+                    <h2><i class="fas fa-database"></i> Backups</h2>
+                    <button class="btn btn-success" onclick="createBackup()">
+                        <i class="fas fa-plus"></i> Novo Backup
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-list"></i> Backups Disponíveis</h3>
+                    </div>
+                    <div class="card-content">
+                        <div id="backupsContainer">
+                            <div class="loading">Carregando backups...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Page -->
+            <div id="users" class="page">
+                <div class="page-header">
+                    <h2><i class="fas fa-users"></i> Usuários Admin</h2>
+                    <button class="btn btn-success" onclick="showCreateUser()">
+                        <i class="fas fa-plus"></i> Novo Usuário
+                    </button>
+                </div>
+
+                <div class="users-grid">
+                    <div class="card">
+                <!-- Activity Page -->
+                <div id="activity" class="page">
+                    <div class="page-header">
+                        <h2><i class="fas fa-bolt"></i> Atividade dos Usuários</h2>
+                        <button class="btn btn-primary" onclick="refreshActivity()">
+                            <i class="fas fa-sync-alt"></i> Atualizar
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-list"></i> Logs de Atividade</h3>
+                        </div>
+                        <div class="card-content">
+                            <div id="activityContainer">
+                                <div class="loading">Carregando atividade...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                        <div class="card-header">
+                            <h3><i class="fas fa-user-plus"></i> Criar Usuário</h3>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-group">
+                                <label for="newUsername">Nome de Usuário:</label>
+                                <input type="text" id="newUsername" class="form-control" placeholder="admin">
+                            </div>
+                            <div class="form-group">
+                                <label for="newPassword">Senha:</label>
+                                <input type="password" id="newPassword" class="form-control" placeholder="senha123">
+                            </div>
+                            <button class="btn btn-success" onclick="createUser()">
+                                <i class="fas fa-save"></i> Criar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-list"></i> Usuários Existentes</h3>
+                        </div>
+                        <div class="card-content">
+                            <div id="usersContainer">
+                                <div class="loading">Carregando usuários...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions Page -->
+            <div id="actions" class="page">
+                <div class="page-header">
+                    <h2><i class="fas fa-tools"></i> Ações do Sistema</h2>
+                </div>
+
+                <div class="actions-grid">
+                    <!-- Memory Actions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-memory"></i> Ações de Memória</h3>
+                        </div>
+                        <div class="card-content">
+                            <button class="btn btn-danger btn-block" onclick="clearMemoryConfirm()">
+                                <i class="fas fa-trash"></i> Limpar Toda a Memória
+                            </button>
+                            <div class="form-group mt-3">
+                                <label for="cleanupDays">Cleanup de chats inativos (dias):</label>
+                                <input type="number" id="cleanupDays" class="form-control" value="30" min="1" max="365">
+                                <button class="btn btn-warning mt-2" onclick="cleanupChats()">
+                                    <i class="fas fa-broom"></i> Executar Cleanup
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rate Limit Actions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-tachometer-alt"></i> Rate Limiting</h3>
+                        </div>
+                        <div class="card-content">
+                            <button class="btn btn-warning btn-block" onclick="resetAllRateLimit()">
+                                <i class="fas fa-redo"></i> Reset Todos os Rate Limits
+                            </button>
+                            <div class="form-group mt-3">
+                                <label for="resetPhone">Reset Rate Limit por Telefone:</label>
+                                <input type="text" id="resetPhone" class="form-control" placeholder="5511999999999">
+                                <button class="btn btn-warning mt-2" onclick="resetUserRateLimit()">
+                                    <i class="fas fa-redo"></i> Reset Usuário
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Actions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-server"></i> Ações do Sistema</h3>
+                        </div>
+                        <div class="card-content">
+                            <button class="btn btn-primary btn-block" onclick="testLLM()">
+                                <i class="fas fa-brain"></i> Testar Conexão com IA
+                            </button>
+                            <button class="btn btn-success btn-block mt-2" onclick="createBackup()">
+                                <i class="fas fa-save"></i> Criar Backup Manual
+                            </button>
+                            <button class="btn btn-danger btn-block mt-2" onclick="restartBotConfirm()">
+                                <i class="fas fa-power-off"></i> Reiniciar Bot
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Confirmação</h3>
+                <span class="modal-close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage">Tem certeza?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button class="btn btn-danger" id="modalConfirmBtn" onclick="closeModal()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
