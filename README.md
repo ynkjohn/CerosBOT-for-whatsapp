@@ -282,7 +282,486 @@ O CerosAI possui uma API REST robusta com endpoints para controle total:
 - **Logs estruturados** de todas as requisições
 - **Respostas JSON** consistentes
 
-## �🎮 Comandos do Bot
+## 🔧 Troubleshooting Avançado
+
+### 🩺 **Diagnóstico Automático**
+Execute o comando de diagnóstico completo:
+```bash
+npm run health
+```
+
+**O que é verificado:**
+- ✅ Variáveis de ambiente obrigatórias
+- ✅ Conexão com LLM/IA
+- ✅ Sistema de memória e backup
+- ✅ Performance e recursos
+- ✅ Integridade dos dados
+
+### ❌ **Problemas Comuns e Soluções**
+
+#### 🔌 **Erro de Conexão LLM**
+```
+ERRO [CONNECTION] [ALTA] fetch failed
+```
+
+**Soluções:**
+1. **Verifique se LM Studio está rodando**
+   ```bash
+   # Teste manual
+   curl http://localhost:1234/v1/chat/completions
+   ```
+
+2. **Teste diferentes endpoints**
+   ```env
+   # LM Studio
+   API_ENDPOINT=http://localhost:1234/v1/chat/completions
+   
+   # Ollama
+   API_ENDPOINT=http://localhost:11434/v1/chat/completions
+   
+   # IP específico
+   API_ENDPOINT=http://192.168.1.100:1234/v1/chat/completions
+   ```
+
+3. **Ajuste firewall/antivírus**
+   - Libere porta 1234 no Windows Defender
+   - Adicione exceção para LM Studio
+
+#### ⏰ **Timeouts Constantes**
+```
+ERRO [TIMEOUT] [ALTA] Timeout após 30000ms
+```
+
+**Soluções:**
+1. **Ajuste configurações de performance**
+   ```env
+   REQUEST_TIMEOUT=120000    # 2 minutos
+   MAX_TOKENS=400           # Reduzir tokens
+   MAX_HISTORY_MESSAGES=10  # Menos contexto
+   ```
+
+2. **Otimização automática**
+   ```bash
+   npm run optimize
+   ```
+
+3. **Use modelo mais rápido**
+   ```env
+   MODEL_NAME=phi-3.5-mini-instruct  # Modelo menor
+   ```
+
+#### 💾 **Problemas de Memória**
+```
+ERRO [MEMORY] Arquivo muito grande
+```
+
+**Soluções:**
+1. **Limpeza automática**
+   ```bash
+   npm run cleanup
+   ```
+
+2. **Configurar limites**
+   ```env
+   MAX_HISTORY_MESSAGES=30
+   MAX_MEMORY_ENTRIES=500
+   ```
+
+3. **Via Control Panel**
+   - Acesse "Ações" → "Limpar Memória"
+
+#### 📱 **WhatsApp Desconectado**
+```
+ERRO [WHATSAPP_AUTH] QR Code expirado
+```
+
+**Soluções:**
+1. **Delete dados de autenticação**
+   ```bash
+   rm -rf wwebjs_auth/
+   npm start
+   ```
+
+2. **Escaneie novo QR Code**
+   - Aguarde aparecer no terminal
+   - Use WhatsApp → Aparelhos Conectados
+
+### 🚀 **Otimização de Performance**
+
+#### ⚡ **Script de Otimização Automática**
+```bash
+npm run optimize
+```
+
+**O que faz:**
+- Testa velocidade do modelo atual
+- Aplica configurações otimizadas automaticamente
+- Sugere melhorias específicas
+- Salva configurações no `.env`
+
+#### 🎯 **Configurações por Velocidade de Modelo**
+
+**Modelo Rápido (< 30s):**
+```env
+MAX_HISTORY_MESSAGES=20
+MAX_TOKENS=800
+TEMPERATURE=0.75
+REQUEST_TIMEOUT=60000
+```
+
+**Modelo Lento (> 60s):**
+```env
+MAX_HISTORY_MESSAGES=5
+MAX_TOKENS=200
+TEMPERATURE=0.6
+REQUEST_TIMEOUT=180000
+```
+
+#### 📊 **Monitoramento de Performance**
+```bash
+# Status em tempo real
+npm run health
+
+# Análise de erros
+npm run analyze-errors
+
+# Estatísticas detalhadas
+npm run test-intelligence
+```
+
+### 🆘 **Suporte e Debug**
+
+#### 📋 **Coletando Informações para Suporte**
+```bash
+# 1. Status completo
+npm run health > diagnostico.txt
+
+# 2. Logs recentes
+npm run analyze-errors >> diagnostico.txt
+
+# 3. Configuração atual (sem dados sensíveis)
+cat .env | grep -v API_KEY >> diagnostico.txt
+```
+
+#### 🔍 **Logs Detalhados**
+```bash
+# Ver logs em tempo real
+npm run pm2:logs
+
+# Logs estruturados
+tail -f logs/bot.log
+```
+
+#### 🧪 **Modo Debug**
+```env
+LOG_LEVEL=debug  # Logs detalhados
+```
+
+---
+
+## 📚 API Documentation
+
+### 🌐 **Base URL**
+```
+http://localhost:3001/api
+```
+
+### 🔐 **Segurança**
+- **CORS**: Configurado para localhost e Electron
+- **Rate Limiting**: 100 req/min por IP
+- **Validação**: Entrada validada em todos endpoints
+- **Headers de Segurança**: X-Frame-Options, X-Content-Type-Options
+
+### 📊 **Endpoints de Status**
+
+#### `GET /api/status`
+Retorna status geral do sistema com métricas básicas.
+
+**Query Parameters:**
+- `detailed` (boolean): Include métricas detalhadas
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "bot": {
+      "connected": true,
+      "uptime": 3600,
+      "health": 95
+    },
+    "memory": {
+      "totalChats": 150,
+      "totalMessages": 2500,
+      "memorySizeMB": 2.3
+    },
+    "performance": {
+      "avgResponseTime": 15,
+      "successRate": 98.5,
+      "throughput": 12
+    },
+    "errors": {
+      "recentCount": 2,
+      "criticalCount": 0,
+      "errorRate": 0.1
+    }
+  }
+}
+```
+
+#### `GET /api/stats`
+Estatísticas detalhadas com análise de performance.
+
+**Query Parameters:**
+- `timeframe` (string): '1h', '24h', '7d', 'all'
+- `includePatterns` (boolean): Incluir padrões de erro
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "overview": {
+      "healthScore": 92,
+      "uptime": 3600,
+      "avgResponseTime": 15,
+      "successRate": 98.5
+    },
+    "performance": {
+      "trends": {
+        "direction": "stable",
+        "percentage": 2
+      }
+    },
+    "errors": {
+      "patterns": [
+        {
+          "pattern": "connection:NetworkError",
+          "frequency": 0.2,
+          "count": 5
+        }
+      ]
+    }
+  }
+}
+```
+
+### ⚙️ **Endpoints de Configuração**
+
+#### `GET /api/config`
+Obter configurações atuais do .env.
+
+**Query Parameters:**
+- `secure` (boolean): Ocultar valores sensíveis (default: true)
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "API_ENDPOINT": "http://localhost:1234/v1/chat/completions",
+    "MODEL_NAME": "llama-3.1-8b",
+    "MAX_TOKENS": "800",
+    "API_KEY": "********"
+  },
+  "metadata": {
+    "totalKeys": 25,
+    "hiddenKeys": 2,
+    "lastModified": "2025-01-21T10:30:00Z"
+  }
+}
+```
+
+#### `POST /api/config`
+Salvar configurações no .env com validação.
+
+**Body:**
+```json
+{
+  "MAX_TOKENS": "1000",
+  "TEMPERATURE": "0.8",
+  "MODEL_NAME": "new-model"
+}
+```
+
+**Validation Rules:**
+- `MAX_TOKENS`: 50-8192
+- `TEMPERATURE`: 0.0-2.0
+- `REQUEST_TIMEOUT`: > 0
+- `API_ENDPOINT`: Valid URL format
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Configuração salva com sucesso",
+  "updatedKeys": ["MAX_TOKENS", "TEMPERATURE"]
+}
+```
+
+### 🧪 **Endpoints de Teste**
+
+#### `POST /api/test-llm`
+Testar conexão com LLM atual.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "success": true,
+    "working": true,
+    "response": "OK",
+    "responseTime": 1200
+  },
+  "timestamp": "2025-01-21T10:30:00Z"
+}
+```
+
+### 📋 **Endpoints de Logs**
+
+#### `GET /api/logs`
+Obter logs recentes com filtros avançados.
+
+**Query Parameters:**
+- `limit` (number): 1-500 (default: 100)
+- `severity` (string): 'low', 'medium', 'high'
+- `category` (string): 'connection', 'timeout', 'memory', etc.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "errors": [
+      {
+        "id": "error_1642751234567_abc123",
+        "category": "connection",
+        "severity": "high",
+        "message": "fetch failed",
+        "timestamp": "2025-01-21T10:30:00Z",
+        "possibleCauses": ["Servidor LLM offline"],
+        "suggestedFixes": ["Verificar se LM Studio está rodando"]
+      }
+    ],
+    "stats": {
+      "overview": {
+        "recentErrorsCount": 1,
+        "errorRate": 0.1
+      }
+    }
+  },
+  "metadata": {
+    "totalReturned": 1,
+    "limitApplied": 100
+  }
+}
+```
+
+#### `DELETE /api/logs`
+Limpar todos os logs de erro.
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Logs limpos com sucesso",
+  "data": {
+    "clearedErrors": 25,
+    "clearedAt": "2025-01-21T10:30:00Z"
+  }
+}
+```
+
+### 🎛️ **Endpoints de Ações**
+
+#### `POST /api/actions/:action`
+Executar ações do sistema.
+
+**Available Actions:**
+- `clear-memory`: Limpar toda memória
+- `cleanup-chats`: Limpar chats inativos
+- `reset-rate-limit`: Resetar rate limiting
+- `create-backup`: Criar backup manual
+- `restart-bot`: Reiniciar bot via PM2
+
+**Example - Cleanup chats:**
+```bash
+POST /api/actions/cleanup-chats
+Content-Type: application/json
+
+{
+  "params": {
+    "days": 30
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Cleanup concluído! 15 chats removidos.",
+  "data": {
+    "removedChats": 15,
+    "removedMessages": 450
+  }
+}
+```
+
+### 💾 **Endpoints de Backup**
+
+#### `GET /api/backups`
+Listar backups disponíveis.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "filename": "backup_2025-01-21_10-30.json",
+      "size": "2.5MB",
+      "created": "2025-01-21T10:30:00Z",
+      "type": "automatic"
+    }
+  ]
+}
+```
+
+#### `POST /api/backups/restore/:id`
+Restaurar backup específico.
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Backup restaurado com sucesso!",
+  "data": {
+    "restoredChats": 150,
+    "restoredMessages": 2500
+  }
+}
+```
+
+### 🚫 **Error Responses**
+Todos os endpoints seguem o padrão de erro:
+
+```json
+{
+  "success": false,
+  "error": "Mensagem de erro",
+  "field": "campo_com_erro",
+  "details": ["Detalhes adicionais"]
+}
+```
+
+**HTTP Status Codes:**
+- `400`: Bad Request (validação falhou)
+- `429`: Too Many Requests (rate limit)
+- `500`: Internal Server Error
+
+## 🎮 Comandos do Bot
 
 ### 👤 **Comandos de Usuário**
 | Comando | Descrição |
