@@ -16,6 +16,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - **Compatibilidade Terminal**: Logger adaptado para diferentes ambientes de terminal
 - **Acentos portugueses**: Conversão automática de caracteres acentuados (ção → cao, ã → a, etc.)
 - **Símbolos Unicode**: Remoção completa de caracteres problemáticos no Windows CMD
+- **Marcações WhatsApp**: Bot agora filtra marcações (@número) antes de processar mensagens, evitando respostas confusas
 
 ---
 

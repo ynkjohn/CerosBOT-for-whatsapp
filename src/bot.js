@@ -177,7 +177,13 @@ client.on('message', async msg => {
     // Mostra que está "digitando" para mensagens longas
     await chat.sendStateTyping();
 
-    pushMessage(id, 'user', msg.body);
+    // Limpa marcações (@número) da mensagem antes de processar
+    const cleanMessage = msg.body.replace(/@\d+/g, '').trim();
+    
+    // Se a mensagem ficou vazia após limpar as marcações, usa uma mensagem padrão
+    const processedMessage = cleanMessage || 'Olá!';
+
+    pushMessage(id, 'user', processedMessage);
 
     // Obtém e limpa o contexto para evitar confusão da IA
     let contextMessages = getThread(id);
