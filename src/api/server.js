@@ -4,6 +4,7 @@ import { logActivity, getActivityLog } from '../lib/activityLogger.js';
 import cors from 'cors';
 import { promises as fs } from 'fs';
 import { join } from 'path';
+import { exec } from 'child_process';
 import { getMemoryStats, clearMemory, cleanupInactiveChats } from '../lib/memory.js';
 import { getRateLimitStats, rateLimiter } from '../lib/rateLimit.js';
 import { testLLMConnection, getModelInfo } from '../lib/llm.js';
@@ -231,6 +232,7 @@ app.delete('/api/logs', async (req, res) => {
 // Ações do sistema
 app.post('/api/actions/:action', async (req, res) => {
   try {
+    logger.debug('API Action request:', { params: req.params, body: req.body });
     const { action } = req.params;
     const { params = {} } = req.body;
     
@@ -292,12 +294,8 @@ app.post('/api/actions/:action', async (req, res) => {
         break;
         
       case 'restart-bot':
-        logger.info('🔄 Reinicializando bot via Control Panel');
-        
-        // Verificar se está rodando com PM2
-        if (process.env.PM2_HOME || process.env.name === 'cerosai-bot') {
-          // Import dinâmico para ES6
-          const { exec } = await import('child_process');
+        try {
+          logger.info('🔄 Reinicializando bot via Control Panel');
           
           res.json({
             success: true,
@@ -310,19 +308,15 @@ app.post('/api/actions/:action', async (req, res) => {
               if (error) {
                 logger.error('Erro no PM2 restart:', error);
                 // Fallback para process.exit se PM2 falhar
-                process.exit(0);
+                setTimeout(() => process.exit(0), 1000);
               } else {
                 logger.info('PM2 restart executado com sucesso');
               }
             });
           }, 1000);
-        } else {
-          // Fallback para restart manual se não estiver usando PM2
-          res.json({
-            success: true,
-            message: 'Bot será reiniciado em 2 segundos...'
-          });
-          setTimeout(() => process.exit(0), 2000);
+        } catch (error) {
+          logger.error('Erro no restart-bot:', error);
+          res.status(500).json({ success: false, error: error.message });
         }
         break;
         

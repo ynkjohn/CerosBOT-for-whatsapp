@@ -1,0 +1,28 @@
+{
+  "120363403257910203@g.us": [
+    {
+      "role": "user",
+      "content": "@5514996083583",
+      "timestamp": "2025-09-21T05:22:00.113Z",
+      "tokens": 14
+    },
+    {
+      "role": "assistant",
+      "content": "Olá! Você está tentando entrar em contato comigo através do número 55 1499 6083 583, não é? \n\nEstou aqui para ajudar! Qual é o seu problema ou pergunta? Quero ser útil.",
+      "timestamp": "2025-09-21T05:22:06.566Z",
+      "tokens": 168
+    },
+    {
+      "role": "user",
+      "content": "@5514996083583 eae",
+      "timestamp": "2025-09-21T05:22:07.097Z",
+      "tokens": 18
+    },
+    {
+      "role": "assistant",
+      "content": "E aí? Como posso te ajudar hoje? Estamos no domingo, dia 21 de setembro de 2025. Você quer conversar sobre algo em particular ou apenas passar o tempo? Estou aqui para você!",
+      "timestamp": "2025-09-21T05:22:13.599Z",
+      "tokens": 173
+    }
+  ]
+}
